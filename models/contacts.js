@@ -1,3 +1,4 @@
+
 const { Contacts } = require("../db/contactModel");
 
 const getContacts = async () => {
