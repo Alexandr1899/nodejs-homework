@@ -1,5 +1,4 @@
-const { loginSchema } = require("./Schemas/loginSchema");
-
+const { loginSchema } = require("./schemas/loginSchema");
 
 const loginValidation = (req, res, next) => {
   const validationResult = loginSchema.validate(req.body);

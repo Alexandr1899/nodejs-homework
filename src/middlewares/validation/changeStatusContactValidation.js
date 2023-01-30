@@ -1,5 +1,4 @@
-const { statusSchema } = require("./Schemas/statusSchema");
-
+const { statusSchema } = require("./schemas/statusSchema");
 
 const changeStatusContactValidation = (req, res, next) => {
   const validationResult = statusSchema.validate(req.body);

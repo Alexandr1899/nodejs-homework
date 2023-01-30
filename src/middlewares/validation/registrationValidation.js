@@ -1,5 +1,4 @@
-const { registrationSchema } = require("./Schemas/registrationSchema");
-
+const { registrationSchema } = require("./schemas/reagistrationSchema");
 
 const registrationValidation = (req, res, next) => {
   const validationResult = registrationSchema.validate(req.body);
