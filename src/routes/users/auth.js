@@ -7,7 +7,10 @@ const {
   getCurrentUserController,
   changeSubscriptionController,
   changeAvatarController,
+  verificationController,
+  resendVerificationController,
 } = require("../../controllers/usersControllers");
+
 
 const { asyncWrapper } = require("../../helpers/asyncWrapper");
 const checkJWT = require("../../middlewares/checkJwt");
@@ -21,6 +24,9 @@ const {
 } = require("../../middlewares/validation/registrationValidation");
 
 const router = express.Router();
+const {
+  verifyValidation,
+} = require("../../middlewares/validation/verifyValidation");
 
 router.post(
   "/signup",
@@ -41,6 +47,12 @@ router.patch(
   checkJWT,
   uploadMiddleware.single("avatar"),
   asyncWrapper(changeAvatarController)
+);
+router.get("/verify/:verificationToken", asyncWrapper(verificationController));
+router.post(
+  "/verify",
+  verifyValidation,
+  asyncWrapper(resendVerificationController)
 );
 
 module.exports = router;
