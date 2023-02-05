@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
 const { replaceAvatar } = require("../helpers/replaceAvatar");
+const sendMail = require("../helpers/sendEmail");
+const { uuid } = require("uuidv4");
 
 const registration = async (name, email, password) => {
   const candidate = await User.findOne({ email });
@@ -11,14 +13,17 @@ const registration = async (name, email, password) => {
     throw new Error("Email in use");
   }
   const avatarURL = gravatar.url(email);
+  const verificationToken = uuid();
   const user = new User({
     name,
     email,
     password: await bcrypt.hash(password, 10),
     avatarURL,
+    verificationToken
   });
   await user.save();
   user.password = null;
+  await sendMail(email, verificationToken);
   return user;
 };
 
@@ -70,6 +75,40 @@ const changeAvatar = async (token, req, originalname, tempUpload, avatarURL) => 
 
   return { message: "User avatar was changed." };
 };
+const verification = async (verificationToken) => {
+  const user = await User.findOne({
+    verificationToken,
+    verify: false,
+  });
+  console.log(user);
+
+  if (!user) {
+    throw new Error(404, "Not found");
+  }
+
+  user.verificationToken = "null";
+  user.verify = true;
+
+  await user.save();
+
+  return { message: "User was verified." };
+};
+
+const resendVerification = async ({ email }) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error(404, "User not found!");
+  }
+
+  if (user.verify) {
+    throw new Error(400, "Verification has already been passed!");
+  }
+
+  sendMail(email, user.verificationToken);
+
+  return { message: "User is verified." };
+};
 
 module.exports = {
   registration,
@@ -78,4 +117,6 @@ module.exports = {
   getCurrent,
   changeUserSubscription,
   changeAvatar,
+  verification,
+  resendVerification,
 };

@@ -6,6 +6,8 @@ const {
   getCurrent,
   changeUserSubscription,
   changeAvatar,
+  resendVerification,
+  verification,
 } = require("../models/users");
 const { User } = require("../../db/userModel");
 
@@ -98,6 +100,21 @@ const changeAvatarController = async (req, res, next) => {
 
   res.status(200).json({ message: "User avatar was changed." });
 };
+const verificationController = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  await verification(verificationToken);
+
+  res.status(200).json({ message: "Verification is successful!" });
+};
+
+const resendVerificationController = async (req, res, next) => {
+  const { email } = req.body;
+
+  await resendVerification({ email });
+
+  res.status(400).json({ message: "Verification has already been passed." });
+};
 
 module.exports = {
   registrationController,
@@ -106,4 +123,6 @@ module.exports = {
   getCurrentUserController,
   changeSubscriptionController,
   changeAvatarController,
+  verificationController,
+  resendVerificationController,
 };
